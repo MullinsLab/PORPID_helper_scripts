@@ -1,0 +1,15 @@
+#!/bin/bash
+# Displays a list of all datasets
+
+data_in="/data/in/"
+
+# make sure $data_in exists
+if [ ! -d $data_in ]; then
+  echo "$data_in does not exist. Unable to find available datasets."
+  exit 1
+fi
+
+cd $data_in
+echo "Available datasets:"
+#ls -1 $data_in*.fastq.gz | sed 's/\/data\/in\///g' | sed 's/.fastq.gz//g'
+ls -1 $data_in*-config.yaml | sed 's/\/data\/in\///g' | sed 's/.config.yaml//g'

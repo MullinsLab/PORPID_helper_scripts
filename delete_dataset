@@ -1,0 +1,26 @@
+#!/bin/bash
+# Deletes a dataset. Requires confirmation.
+
+# if no arguments were passed, display usage info new_dataset <dataset name> and run list_datasets
+if [ $# -eq 0 ]; then
+  echo "Usage: $0 <dataset name>"
+  echo "For a list of datasets, run: list_datasets"
+  exit 1
+fi
+
+DS=$1
+
+# make sure dataset doesn't have odd characters or spaces
+
+# make sure ~/$DS/ exists
+if [ ! -d ~/$DS ]; then
+  echo "$DS dataset does not exist, canceling deletion."
+  exit 1
+fi
+
+read -p "Are you sure you wish to remove the $DS dataset? Y to proceed, any other key to cancel. " answer
+echo " "
+case "$answer" in
+  [yY]) rm -rf ~/$DS/ && echo "Dataset $DS has been deleted.";;
+  * ) echo "Dataset deletion canceled." && exit;;
+esac

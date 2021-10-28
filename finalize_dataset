@@ -1,0 +1,82 @@
+#!/bin/bash
+# Tars and gzips PORPID-postproc output and moves it to $data_out
+
+# if no arguments were passed, display usage info new_dataset <dataset name> and run list_datasets
+if [ $# -eq 0 ]; then
+  echo "Usage: $0 <dataset name>"
+  echo "For a list of datasets, run: list_datasets"
+  exit 1
+fi
+
+DS=$1
+username=`whoami`
+data_out="/data/out/"
+
+# make sure dataset doesn't have odd characters or spaces
+
+# make sure ~/$DS/, ~/$DS/porpid/$DS/, ~/$DS/postproc/$DS/, and $data_out exist
+if [ ! -d ~/$DS ]; then
+  echo "$DS does not exist, canceling deletion."
+  exit 1
+fi
+
+if [ ! -d ~/$DS/porpid/$DS/ ]; then
+  echo "There is no porpid output for $DS. Have you run analyze_dataset $DS?"
+  exit 1
+fi
+
+if [ ! -d ~/$DS/postproc/$DS/ ]; then
+  echo "There is no postproc output for $DS. Try rerunning analyze_dataset $DS."
+  exit 1
+fi
+
+if [ ! -d $data_out ]; then
+  echo "$data_out does not exist, canceling finalize_dataset."
+  exit 1
+fi
+
+# tar and gzip PORPID-postproc output
+echo "Compressing $DS porpid output..."
+cd ~/$DS/porpid/
+tar -cf $DS-porpid-$username.tar $DS
+
+if [ ! -s $DS-porpid-$username.tar ]; then
+  echo "Compressing $DS porpid output failed. Canceling."
+  exit 1
+fi
+
+# use pigz if it's installed for parallel compression, otherwise gzip
+if type pigz > /dev/null; then
+  pigz -p 4 $DS-porpid-$username.tar
+else
+  gzip $DS-porpid-$username.tar
+fi
+
+# move tarred and gzipped output
+mv $DS-porpid-$username.tar.gz $data_out
+echo "$DS-porpid-$username.tar.gz moved to $data_out"
+
+# clean up output directories
+# remove ~/$DS/porpid/$DS/ when certain tar and gzip were successful and the .tar.gz is not empty
+rm -rf ~/$DS/porpid/$DS/
+echo "~/$DS/porpid/$DS/ directory removed"
+#echo "PORPID-postproc output folders were not deleted; this was intentional."
+
+echo "Compressing $DS postproc output..."
+cd ~/$DS/postproc/
+tar -zcf $DS-postproc-$username.tar.gz $DS
+
+# make sure the tar.gz file size is > 0
+if [ ! -s $DS-postproc-$username.tar.gz ]; then
+  echo "Compressing $DS postproc output failed. Canceling."
+  exit 1
+fi
+
+mv $DS-postproc-$username.tar.gz $data_out
+echo "$DS-postproc-$username.tar.gz moved to $data_out"
+# remove ~/$DS/postproc/$DS/ when certain tar and gzip were successful and the .tar.gz is not empty
+rm -rf ~/$DS/postproc/$DS/
+echo "~/$DS/postproc/$DS/ directory removed"
+
+echo " "
+echo "finalize_dataset $DS has completed successfully."

@@ -1,0 +1,50 @@
+#!/bin/bash
+# Creates a new dataset to run PORPID-postproc on in the user's home directory
+
+# if no arguments were passed, display usage info new_dataset <dataset name> and run list_datasets
+if [ $# -eq 0 ]; then
+  echo "Usage: $0 <dataset name>"
+  echo "For a list of datasets, run: list_datasets"
+  exit 1
+fi
+
+DS=$1
+
+# make sure dataset doesn't have odd characters or spaces
+
+# make sure ~/porpidpostproc does not already exist, otherwise print warning and exit
+if [ -d ~/porpidpostproc/ ]; then
+  echo "~/porpidpostproc/ already exists, canceling dataset creation. Delete it with: delete_dataset $DS"
+  exit 1
+fi
+
+# make sure ~/DS does not already exist, otherwise print warning and exit
+if [ -d ~/$DS ]; then
+  echo "$DS already exists, canceling dataset creation. Delete it with: delete_dataset $DS"
+  exit 1
+fi
+
+# make sure /data/in/<dataset>.fastq.gz exists as does /data/in/<dataset>-config.yaml
+if [ ! -f /data/in/$DS.fastq.gz ]; then
+  echo "/data/in/$DS.fastq.gz does not exist, canceling dataset creation."
+  exit 1
+fi
+
+if [ ! -f /data/in/$DS-config.yaml ]; then
+  echo "/data/in/$DS-config.yaml does not exist, canceling dataset creation."
+  exit 1
+fi
+
+echo "Setting up dataset $DS..."
+
+# copy porpidpostproc to user's home directory and rename to <dataset>
+cp -r /opt/porpidpostproc/ ~/ && mv ~/porpidpostproc/ ~/$DS
+
+# copy yaml and fastq.gz files
+cp /data/in/$DS-config.yaml ~/$DS/ && cp ~/$DS/$DS-config.yaml ~/$DS/config.yaml
+gunzip -ck /data/in/$DS.fastq.gz > ~/$DS/raw-reads/$DS.fastq
+
+echo "Dataset $DS has been created at ~/$DS/"
+echo " "
+echo "Run 'test_dataset $DS' to verify the data and config files are set up correctly."
+echo "Run 'analyze_dataset $DS' to begin the analysis by PORPID-postproc."

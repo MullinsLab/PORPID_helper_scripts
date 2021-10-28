@@ -1,0 +1,26 @@
+#!/bin/bash
+# Runs PORPID-postproc on a dataset 
+
+# if no arguments were passed, display usage info new_dataset <dataset name> and run list_datasets
+if [ $# -eq 0 ]; then
+  echo "Usage: $0 <dataset name>"
+  echo "For a list of datasets, run: list_datasets"
+  exit 1
+fi
+
+DS=$1
+
+# make sure dataset doesn't have odd characters or spaces
+
+# make sure ~/$DS/ exists
+if [ ! -d ~/$DS ]; then
+  echo "$DS does not exist, canceling deletion."
+  exit 1
+fi
+
+
+cd ~/$DS/
+snakemake -j 8
+
+echo " "
+echo "Run 'finalize_dataset $DS' to tar and gzip the PORPID-postproc output and move to /data/out/"
