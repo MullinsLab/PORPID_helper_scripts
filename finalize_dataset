@@ -1,7 +1,7 @@
 #!/bin/bash
 # Tars and gzips PORPID-postproc output and moves it to $data_out
 
-# if no arguments were passed, display usage info new_dataset <dataset name> and run list_datasets
+# if no arguments were passed, display usage info and run list_datasets
 if [ $# -eq 0 ]; then
   echo "Usage: $0 <dataset name>"
   echo "For a list of datasets, run: list_datasets"
@@ -53,6 +53,8 @@ else
 fi
 
 # move tarred and gzipped output
+chgrp h705 $DS-porpid-$username.tar.gz
+chmod g-w $DS-porpid-$username.tar.gz
 mv $DS-porpid-$username.tar.gz $data_out
 echo "$DS-porpid-$username.tar.gz moved to $data_out"
 
@@ -72,6 +74,8 @@ if [ ! -s $DS-postproc-$username.tar.gz ]; then
   exit 1
 fi
 
+chgrp h705 $DS-postproc-$username.tar.gz
+chmod g-w $DS-postproc-$username.tar.gz
 mv $DS-postproc-$username.tar.gz $data_out
 echo "$DS-postproc-$username.tar.gz moved to $data_out"
 # remove ~/$DS/postproc/$DS/ when certain tar and gzip were successful and the .tar.gz is not empty
@@ -79,4 +83,4 @@ rm -rf ~/$DS/postproc/$DS/
 echo "~/$DS/postproc/$DS/ directory removed"
 
 echo " "
-echo "finalize_dataset $DS has completed successfully."
+echo "finalize_dataset $DS has completed successfully. You can find it in /data/out/"

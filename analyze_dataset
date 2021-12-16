@@ -1,7 +1,7 @@
 #!/bin/bash
 # Runs PORPID-postproc on a dataset 
 
-# if no arguments were passed, display usage info new_dataset <dataset name> and run list_datasets
+# if no arguments were passed, display usage info and run list_datasets
 if [ $# -eq 0 ]; then
   echo "Usage: $0 <dataset name>"
   echo "For a list of datasets, run: list_datasets"

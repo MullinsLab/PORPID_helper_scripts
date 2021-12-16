@@ -12,4 +12,5 @@ fi
 cd $data_in
 echo "Available datasets:"
 #ls -1 $data_in*.fastq.gz | sed 's/\/data\/in\///g' | sed 's/.fastq.gz//g'
-ls -1 $data_in*-config.yaml | sed 's/\/data\/in\///g' | sed 's/.config.yaml//g'
+#ls -1 $data_in*-config.yaml | sed 's/\/data\/in\///g' | sed 's/.config.yaml//g'
+ls -1 ${data_in}config/*-config.yaml | sed 's/\/data\/in\/config\///g' | sed 's/.config.yaml//g'
